@@ -2,37 +2,32 @@ import "./App.css";
 import Cart from "./Cart";
 import Navbar from "./Navbar";
 import React from "react";
-
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+import "firebase/compat/storage";
 class App extends React.Component {
   constructor() {
     super();
 
     //state is way to store local data for particular component ,in object structure
-    this.state = {
-      products: [
-        {
-          price: 999,
-          title: "mobile phone",
-          qty: 1,
-          img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cGhvbmV8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-          id: 1,
-        },
-        {
-          price: 9999,
-          title: "TV",
-          qty: 1,
-          img: "https://media.istockphoto.com/id/1395191574/photo/black-led-tv-television-screen-blank-isolated.jpg?b=1&s=170667a&w=0&k=20&c=rT4t6CuNap53Qu78fbFGMy5IEji46IqQDILCrfAcHtg=",
-          id: 2,
-        },
-        {
-          price: 99999,
-          title: "Laptop",
-          qty: 1,
-          img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-          id: 3,
-        },
-      ],
-    };
+    this.state = { products: [] };
+  }
+
+  componentDidMount() {
+    firebase
+      .firestore()
+      .collection("products")
+      .get()
+      .then((snapshot) => {
+        // console.log(snapshot);
+        const products = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          data["id"] = doc.id;
+          return data;
+        });
+        this.setState({ products: products, loading: false });
+      });
   }
   increaseQuantity = (product) => {
     //set state form 1
